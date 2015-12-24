@@ -1,0 +1,52 @@
+<project name="my.util" default="all" basedir=".">
+  
+  <property file="build.properties" /> 
+
+  <path id="compile.class.path">
+      <fileset dir="lib" includes="*.jar"/>
+  </path>
+
+  <target name="all" depends="init, genparser, compile, jar" />   
+  
+  <target name="init">
+    <mkdir dir="classes"/> 
+    <mkdir dir="${bin.dir}"/> 
+  </target>  
+    
+  <target name="compile">
+    <javac debug="true" encoding="euc-kr" source="1.4" destdir="classes">
+        <classpath refid="compile.class.path"/>
+        <src path="common"/>
+        <src path="src"/>
+    </javac>
+  </target> 
+    
+  <target name="genparser">
+    <mkdir dir="temp" /> 
+    <jjtree target="grammers/jparser.jjt" outputdirectory="temp" javacchome="${javacc.home}"/>
+    <jjtree target="grammers/bparser.jjt" outputdirectory="temp" javacchome="${javacc.home}"/>
+
+    <javacc target="temp/jparser.jj"      outputdirectory="src/effect/jparser" javacchome="${javacc.home}" />
+    <javacc target="temp/bparser.jj"      outputdirectory="src/effect/bparser" javacchome="${javacc.home}" />
+ 
+    <javac encoding="euc-kr" deprecation="false" srcdir="src" destdir="classes" />
+    
+    <jar destfile="${bin.dir}/effect.jar">
+	    <manifest>
+            <attribute name="Main-Class" value="effect.EAMain" />
+	    </manifest>
+        <fileset dir="classes" includes="org/**"/>   
+        <fileset dir="classes" includes="effect/**"/>   
+        <fileset dir="src"     includes="effect/**"/>   
+    </jar> 
+  </target>
+   
+  <target name="jar">
+    <jar destfile="${bin.dir}/my.utils.jar">
+        <fileset dir="grammers" />   
+        <fileset dir="classes" />   
+        <fileset dir="src"     />   
+    </jar> 
+  </target> 
+
+</project>
